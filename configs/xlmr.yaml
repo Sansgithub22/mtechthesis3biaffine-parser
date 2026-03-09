@@ -1,0 +1,38 @@
+# configs/xlmr.yaml
+# XLM-RoBERTa + Biaffine — equivalent to Trankit's architecture
+#
+# Uses xlm-roberta-base (278M params) as encoder instead of BERT (111M).
+# XLM-RoBERTa is trained on 100 languages (2.5TB of data) vs BERT's English only.
+# This is the same backbone used by Trankit.
+#
+# Expected: +1-2% LAS over bert-base-uncased baseline.
+
+# ---- Data paths ----
+train_file: data/en_ewt-ud-train.conllu
+dev_file:   data/en_ewt-ud-dev.conllu
+test_file:  data/en_ewt-ud-test.conllu
+
+# ---- Output ----
+save_dir: checkpoints/xlmr
+
+# ---- XLM-RoBERTa encoder (Trankit's backbone) ----
+bert_model: xlm-roberta-base
+
+# ---- Task head MLPs ----
+arc_mlp_dim:   500
+label_mlp_dim: 100
+mlp_dropout:   0.33
+bert_dropout:  0.1
+
+# ---- Optimizer ----
+bert_lr:  0.00002    # 2e-5 for XLM-RoBERTa encoder layers
+head_lr:  0.001      # 1e-3 for MLP + biaffine head
+
+# Annealing
+decay_factor: 0.75
+decay_steps:  5000
+
+# ---- Training ----
+batch_size: 16        # smaller due to model size
+max_epochs: 30
+patience:   5
