@@ -1,0 +1,51 @@
+# configs/base.yaml
+# Baseline configuration — exact reproduction of Dozat & Manning (2017)
+# Hyperparameters from Table 1 of the paper.
+
+# ---- Data paths (update these to your actual file paths) ----
+train_file: data/en_ewt-ud-train.conllu
+dev_file:   data/en_ewt-ud-dev.conllu
+test_file:  data/en_ewt-ud-test.conllu
+
+# Optional: path to GloVe / fastText .txt embeddings
+# pretrained_embed: data/glove.6B.100d.txt
+
+# ---- Output ----
+save_dir: checkpoints/baseline
+
+# ---- Vocabulary ----
+min_freq: 2   # words appearing fewer than this times → <unk>
+
+# ---- Embeddings (Table 1) ----
+word_embed_dim: 100
+tag_embed_dim:  100
+use_pos: true       # use POS tag embeddings
+
+# CharLSTM Innovation 1 — set to true to enable
+use_char:      false
+char_embed_dim: 50
+char_out_dim:  100
+
+# ---- BiLSTM Encoder (Table 1) ----
+lstm_hidden:  400   # hidden units per direction (800 total output)
+lstm_layers:    3
+lstm_dropout: 0.33  # variational dropout on LSTM inputs and recurrent connections
+
+# ---- MLPs (Table 1) ----
+arc_mlp_dim:   500
+label_mlp_dim: 100
+mlp_dropout:   0.33
+
+# ---- Input dropout (Table 1 + Section 4.2.4) ----
+embed_dropout: 0.33  # applied independently to word and tag embeddings
+
+# ---- Optimizer (Table 1 + Section 4.2.5) ----
+lr:            0.002   # initial learning rate (α = 2e-3)
+decay_factor:  0.75    # annealing factor
+decay_steps:   5000    # anneal every this many steps
+
+# ---- Training ----
+# NOTE: reduced epochs for CPU training — paper uses 50k steps (~100 epochs on GPU
+batch_size:  32
+max_epochs:  30
+patience:    10        # early stopping: stop if dev LAS doesn't improve for N epochs

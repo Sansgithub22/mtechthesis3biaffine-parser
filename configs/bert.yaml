@@ -1,0 +1,39 @@
+# configs/bert.yaml
+# BERT-based parser configuration — Innovation 2
+# Replaces the BiLSTM encoder with a pre-trained BERT model.
+#
+# Expected improvement: +2-4% UAS/LAS over the BiLSTM baseline.
+# Use bert-base-multilingual-cased for cross-lingual experiments.
+
+# ---- Data paths (update these to your actual file paths) ----
+train_file: data/en_ewt-ud-train.conllu
+dev_file:   data/en_ewt-ud-dev.conllu
+test_file:  data/en_ewt-ud-test.conllu
+
+# ---- Output ----
+save_dir: checkpoints/bert
+
+# ---- BERT model (from HuggingFace hub) ----
+bert_model: bert-base-uncased
+# For multilingual: bert_model: bert-base-multilingual-cased
+# For better English: bert_model: roberta-base
+
+# ---- Task head MLPs ----
+arc_mlp_dim:   500
+label_mlp_dim: 100
+mlp_dropout:   0.33
+bert_dropout:  0.1    # dropout on BERT output
+
+# ---- Optimizer ----
+# BERT uses a MUCH smaller LR to avoid catastrophic forgetting
+bert_lr:  0.00002   # 2e-5 for BERT encoder layers
+head_lr:  0.001     # 1e-3 for MLP + biaffine layers (smaller than baseline)
+
+# Annealing (applied to both groups)
+decay_factor: 0.75
+decay_steps:  5000
+
+# ---- Training ----
+batch_size: 16        # smaller batch due to BERT memory requirements
+max_epochs: 50        # BERT converges faster than BiLSTM
+patience:   5         # less patience needed

@@ -1,0 +1,27 @@
+# Model checkpoints (large binary files)
+checkpoints/
+*.pt
+*.pkl
+
+# Dataset files (download separately)
+data/*.conllu
+data/*.zip
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

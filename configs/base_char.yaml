@@ -1,0 +1,47 @@
+# configs/base_char.yaml
+# Baseline + CharLSTM — Innovation 1
+# Identical to base.yaml but with CharLSTM enabled.
+
+# ---- Data paths ----
+train_file: data/en_ewt-ud-train.conllu
+dev_file:   data/en_ewt-ud-dev.conllu
+test_file:  data/en_ewt-ud-test.conllu
+
+# ---- Output ----
+save_dir: checkpoints/baseline_char
+
+# ---- Vocabulary ----
+min_freq: 2
+
+# ---- Embeddings ----
+word_embed_dim: 100
+tag_embed_dim:  100
+use_pos: true
+
+# CharLSTM enabled (Innovation 1)
+use_char:      true
+char_embed_dim: 50
+char_out_dim:  100
+
+# ---- BiLSTM Encoder ----
+lstm_hidden:  400
+lstm_layers:    3
+lstm_dropout: 0.33
+
+# ---- MLPs ----
+arc_mlp_dim:   500
+label_mlp_dim: 100
+mlp_dropout:   0.33
+
+# ---- Dropout ----
+embed_dropout: 0.33
+
+# ---- Optimizer ----
+lr:           0.002
+decay_factor: 0.75
+decay_steps:  5000
+
+# ---- Training ----
+batch_size:  32
+max_epochs:  30
+patience:    10
