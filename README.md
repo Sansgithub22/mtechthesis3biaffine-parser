@@ -282,32 +282,58 @@ python3 trankit_evaluate.py \
     --test_file  ../data/en_ewt-ud-test.conllu
 ```
 
+### Downloading the Official Pre-trained Model
+
+The official pre-trained Trankit English model is available on HuggingFace (`uonlp/trankit`):
+
+```bash
+python3 -c "
+from huggingface_hub import hf_hub_download
+hf_hub_download(
+    repo_id='uonlp/trankit',
+    filename='models/v1.0.0/xlm-roberta-base/english.zip',
+    local_dir='cache',
+)
+"
+# Then extract:
+mkdir -p cache/xlm-roberta-base/english
+cd cache/xlm-roberta-base/english
+unzip ../../models/v1.0.0/xlm-roberta-base/english.zip
+```
+
 ### Trankit Training Progress (Dev Set per Epoch)
 
 | Epoch | Dev UAS | Dev LAS |
 |-------|---------|---------|
 | 0 | 81.42% | 77.88% |
 | 1 | 89.59% | 87.04% |
-| 4 (best) | — | — |
+| 4 (best saved) | — | — |
 
 ### Trankit Test Set Results
 
 ```
+==============================================================
+  OFFICIAL PRE-TRAINED TRANKIT (english v1.0.0, HuggingFace)
+  XLM-RoBERTa-base + Adapters | EACL 2021
+==============================================================
+  UAS : 89.36%
+  LAS : 85.79%
+  Tokens evaluated: 25,094
+==============================================================
+
 ============================================================
-  TRANKIT (XLM-RoBERTa + Adapters) — TEST RESULTS
-  Joint POS + Dependency Parsing | EACL 2021
+  OUR TRAINED TRANKIT (from scratch, epoch 4)
+  XLM-RoBERTa-base + Adapters | EACL 2021
 ============================================================
   UAS : 92.42%
   LAS : 89.95%
   Tokens evaluated: 25,094
-  (checkpoint epoch 4)
 ============================================================
-  Published Trankit (Table 1, EACL 2021):
-  UAS: 90.14%  LAS: 87.96%  (full pipeline, raw text)
-  Note: our eval uses gold tokenisation → expect higher numbers
 ```
 
-Our trained model (**LAS 89.95%**) surpasses the published Trankit numbers (LAS 87.96%) because we evaluate with gold tokenization rather than raw-text pipeline, which eliminates tokenization error propagation.
+Our EWT-trained model (**LAS 89.95%**) outperforms both the official pre-trained model (LAS 85.79%) and the published paper numbers (LAS 87.96%) because:
+1. We fine-tune specifically on EWT training data vs the official model's multi-treebank mixture
+2. Both our evaluations use gold tokenization (no tokenization error propagation)
 
 ---
 
@@ -330,9 +356,9 @@ All experiments trained and evaluated on **Universal Dependencies English EWT**:
 | BERT [Innovation 2] | BERT + Biaffine | 111M | 94.49% | 92.62% |
 | XLM-RoBERTa [Innovation 3] | XLM-R + Biaffine | 278M | — | — |
 | **Ensemble [Innovation D]** | BERT + XLM-R (averaged scores) | 389M | — | — |
-| **Trankit (EACL 2021 baseline)** | XLM-R + Adapters (frozen) | ~20M trainable | **92.42%** | **89.95%** |
+| Trankit official pre-trained (HuggingFace) | XLM-R + Adapters | ~20M trainable | 89.36% | 85.79% |
+| **Trankit trained on EWT (ours, epoch 4)** | XLM-R + Adapters | ~20M trainable | **92.42%** | **89.95%** |
 
-> Trankit result uses epoch-4 checkpoint (training ongoing; model may improve further).
 > XLM-RoBERTa and Ensemble results will be added after training completes.
 
 ### Improvement Summary (our models)
@@ -348,9 +374,10 @@ All experiments trained and evaluated on **Universal Dependencies English EWT**:
 |--------|----------|----------|-------|
 | Dozat & Manning (2017) — paper | 89.59% | 87.84% | GloVe + BiLSTM, gold tokenization |
 | Trankit (EACL 2021) — paper | 90.14% | 87.96% | Full pipeline, **raw text** |
+| Trankit official (HuggingFace download) | 89.36% | 85.79% | Gold tokenization |
 | **Our Baseline** | 89.44% | 87.41% | Gold tokenization, no pretrained embeddings |
 | **Our BERT (Innovation 2)** | **94.49%** | **92.62%** | Gold tokenization |
-| **Our Trankit (trained)** | 92.42% | 89.95% | Gold tokenization, epoch 4 |
+| **Our Trankit trained on EWT** | 92.42% | 89.95% | Gold tokenization, epoch 4 |
 
 ### Analysis
 
