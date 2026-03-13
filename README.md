@@ -307,7 +307,7 @@ unzip ../../models/v1.0.0/xlm-roberta-base/english.zip
 |-------|---------|---------|
 | 0 | 81.42% | 77.88% |
 | 1 | 89.59% | 87.04% |
-| 4 (best saved) | — | — |
+| 29 (final best) | — | — |
 
 ### Trankit Test Set Results
 
@@ -322,18 +322,20 @@ unzip ../../models/v1.0.0/xlm-roberta-base/english.zip
 ==============================================================
 
 ============================================================
-  OUR TRAINED TRANKIT (from scratch, epoch 4)
+  OUR TRAINED TRANKIT (from scratch, 30 epochs on EWT)
   XLM-RoBERTa-base + Adapters | EACL 2021
 ============================================================
-  UAS : 92.42%
-  LAS : 89.95%
+  UAS : 94.69%
+  LAS : 92.95%
   Tokens evaluated: 25,094
+  (checkpoint epoch 29)
 ============================================================
 ```
 
-Our EWT-trained model (**LAS 89.95%**) outperforms both the official pre-trained model (LAS 85.79%) and the published paper numbers (LAS 87.96%) because:
-1. We fine-tune specifically on EWT training data vs the official model's multi-treebank mixture
-2. Both our evaluations use gold tokenization (no tokenization error propagation)
+Our fully trained EWT model (**LAS 92.95%**) is the **best result in the entire project**, surpassing both BERT (LAS 92.62%) and the official pre-trained Trankit (LAS 85.79%). Key reasons:
+1. 30 full epochs of EWT-specific fine-tuning
+2. Gold tokenization evaluation (no tokenization error propagation)
+3. Adapter efficiency: only ~20M trainable params vs 278M total — highly regularized
 
 ---
 
@@ -357,9 +359,9 @@ All experiments trained and evaluated on **Universal Dependencies English EWT**:
 | XLM-RoBERTa [Innovation 3] | XLM-R + Biaffine | 278M | — | — |
 | **Ensemble [Innovation D]** | BERT + XLM-R (averaged scores) | 389M | — | — |
 | Trankit official pre-trained (HuggingFace) | XLM-R + Adapters | ~20M trainable | 89.36% | 85.79% |
-| **Trankit trained on EWT (ours, epoch 4)** | XLM-R + Adapters | ~20M trainable | **92.42%** | **89.95%** |
+| **Trankit trained on EWT (ours, 30 epochs)** | XLM-R + Adapters | ~20M trainable | **94.69%** | **92.95%** |
 
-> XLM-RoBERTa and Ensemble results will be added after training completes.
+> XLM-RoBERTa (Innovation 3) and Ensemble (Innovation D) results pending training.
 
 ### Improvement Summary (our models)
 
@@ -376,14 +378,14 @@ All experiments trained and evaluated on **Universal Dependencies English EWT**:
 | Trankit (EACL 2021) — paper | 90.14% | 87.96% | Full pipeline, **raw text** |
 | Trankit official (HuggingFace download) | 89.36% | 85.79% | Gold tokenization |
 | **Our Baseline** | 89.44% | 87.41% | Gold tokenization, no pretrained embeddings |
-| **Our BERT (Innovation 2)** | **94.49%** | **92.62%** | Gold tokenization |
-| **Our Trankit trained on EWT** | 92.42% | 89.95% | Gold tokenization, epoch 4 |
+| **Our BERT (Innovation 2)** | 94.49% | 92.62% | Gold tokenization |
+| **Our Trankit trained on EWT (30 epochs)** | **94.69%** | **92.95%** | Gold tokenization — best result |
 
 ### Analysis
 
 - **CharLSTM** provides a consistent improvement at low cost (+0.4M parameters). Converges faster because character embeddings help represent rare and OOV words from the very start of training.
 - **BERT** delivers a massive +5.21% LAS improvement because its contextual representations encode rich syntactic information learned from 3.3 billion words of pre-training. It also converges in fewer epochs (17 vs 30) despite having 9× more parameters.
-- **Trankit** achieves 89.95% LAS using only adapter parameters (~1% of XLM-RoBERTa) while keeping the backbone frozen — demonstrating that efficient fine-tuning can match full fine-tuning for structured prediction.
+- **Trankit** achieves **92.95% LAS** (the best result overall) using only adapter parameters (~7% of XLM-RoBERTa) while keeping the backbone frozen — demonstrating that efficient parameter fine-tuning outperforms full fine-tuning (BERT 92.62%) when the backbone is a stronger multilingual model.
 - **Gold tokenization advantage:** All our models and published Dozat & Manning use gold tokenization. Trankit's published 87.96% LAS uses raw text (with tokenization errors), which explains why our Trankit evaluation (89.95%) exceeds the paper.
 
 ---
